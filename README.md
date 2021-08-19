@@ -1,6 +1,6 @@
 # 4399-swf-extractor Java Version Branch
 ## To run the release, you just need to
-> ### 1. Install jdk for version 1.8+ 
+> ### 1. Install jdk for version 1.11+ 
 > ### 2. Type `java -jar [jar package file I have packed]` in dedicated console to run it.
 
 ## FAQ
