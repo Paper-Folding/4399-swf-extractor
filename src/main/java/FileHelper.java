@@ -1,61 +1,75 @@
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
+/**
+ * FileHelper Ultimate Version will the support of java NIO and jdk 11.
+ *
+ * @author Paper Folding
+ */
 public class FileHelper {
-
     public static void WriteToFile(String fileLocation, String content) {
-        FileOutputStream fileOutputStream = null;
+        Path path = Paths.get(fileLocation);
         try {
-            fileOutputStream = new FileOutputStream(new File(fileLocation));
-            FileChannel fileChannel = fileOutputStream.getChannel();
-            ByteBuffer outPut = Charset.forName("utf-8").encode(content);
-            fileChannel.write(outPut);
+            Files.writeString(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
         catch (IOException ignored) {
-
-        }
-        finally {
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     public static String ReadFromFile(String fileLocation) {
-        FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
-        String result = "";
+        Path path = Paths.get(fileLocation);
         try {
-            fileReader = new FileReader(new File(fileLocation));
-            bufferedReader = new BufferedReader(fileReader);
-            String line = null;
-            while ((line = bufferedReader.readLine()) != null)
-                result += line;
+            String result = Files.readString(path, StandardCharsets.UTF_8);
+            return result;
+        }
+        catch (IOException ignore) {
+        }
+        return "";
+    }
+
+    public static void CreateDirectoryIfNotExists(String location) {
+        Path path = Paths.get(location);
+        if (Files.notExists(path)) {
+            try {
+                Files.createDirectory(path);
+            }
+            catch (IOException ignored) {
+            }
+        }
+    }
+
+    public static void DownloadFile(String link, String storePath, String storeFilename) {
+        URL url;
+        ReadableByteChannel rbc = null;
+        FileOutputStream fos = null;
+        try {
+            url = new URL(link);
+            rbc = Channels.newChannel(url.openStream());
+            fos = new FileOutputStream(storePath + storeFilename);
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        }
+        catch (MalformedURLException ignored) {
         }
         catch (IOException ignored) {
-
         }
         finally {
-            if (bufferedReader != null)
-                try {
-                    bufferedReader.close();
-                }
-                catch (IOException ignored) {
-                }
-            if (fileReader != null)
-                try {
-                    fileReader.close();
-                }
-                catch (IOException ignored) {
-                }
+            try {
+                if (rbc != null)
+                    rbc.close();
+                if (fos != null)
+                    fos.close();
+            }
+            catch (IOException ignored) {
+            }
         }
-        return result;
     }
 }

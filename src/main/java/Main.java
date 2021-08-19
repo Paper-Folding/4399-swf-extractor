@@ -40,6 +40,7 @@ public class Main {
             if (xx.equals("Y") || xx.equals("y"))
                 FileHelper.WriteToFile(".swfExtracto", localStoragePath);
         }
+        FileHelper.CreateDirectoryIfNotExists(localStoragePath);
         System.out.println("开始提取并下载swf文件...");
         Map<String, Object> map = extractParameters(link);
         if (!map.get("swfUrl").toString().endsWith("swf")) {
@@ -67,9 +68,7 @@ public class Main {
         catch (IOException e) {
             e.printStackTrace();
         }
-        finally {
-            return result;
-        }
+        return result;
     }
 
     public static void download(String link, String storePath, String storeFilename) {
